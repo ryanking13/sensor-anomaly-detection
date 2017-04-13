@@ -46,7 +46,7 @@ b = tf.Variable(tf.random_normal([n_classes]))
 X_t = tf.transpose(X, [1, 0, 2])
 
 # make RNN cell
-cell = tf.contrib.rnn.BasicRNNCell(n_hidden)
+cell = tf.contrib.rnn.BasicLSTMCell(n_hidden)
 cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=0.5)
 cell = tf.contrib.rnn.MultiRNNCell([cell] * n_layers)
 outputs, states = tf.nn.dynamic_rnn(cell, X_t, dtype=tf.float32, time_major=True)
