@@ -1,34 +1,65 @@
+#-*- coding: utf-8 -*-
+
 import tensorflow as tf
 from tensorflow.contrib import rnn
+from LSTMSettings import *
 import numpy as np
 
-n_hidden = 100  # magic number
-n_layers = 5  # magic number
-n_sensors = 83  # num of input types
-n_sensor_class = 2  # num of output types
 
-# Network model
-# [batch_size, time_steps, input_size]
-# [batch_size, time_steps]
-X = tf.placeholder(tf.float32, [None, None, n_sensors])
-Y = tf.placeholder(tf.float32, [None, 1])
-# [time_steps, batch_size, input_size]
-X_t = tf.transpose(X, [1, 0, 2])
+class LSTMModel:
 
-W = tf.Variable(tf.random_normal([n_hidden, n_sensor_class]))
-b = tf.Variable(tf.random_normal([n_sensor_class]))
+    def __init__(self):
 
-# LSTM cell
-cell = rnn.BasicLSTMCell(n_hidden)
-cell = rnn.DropoutWrapper(cell, output_keep_prob=0.5)
-cell = rnn.MultiRNNCell([cell] * n_layers)
-outputs, states = tf.nn.dynamic_rnn(cell=cell, inputs=X_t, dtype=tf.float32, time_major=True)
+        # Build model
+        # [batch_size, time_steps, input_size]
+        self.X = tf.placeholder(tf.float32, [None, None, n_sensors])
+        # [batch_size, time_steps]
+        self.Y = tf.placeholder(tf.float32, [None, 1])
+        # [time_steps, batch_size, input_size]
+        self.X_t = tf.transpose(self.X, [1, 0, 2])
 
-logits = tf.matmul(outputs[-1], W) + b
-labels = tf.reshape(Y, [-1])
+        # LSTM cell
+        self.cell = rnn.BasicLSTMCell(n_hidden)
+        self.cell = rnn.DropoutWrapper(self.cell, output_keep_prob=0.5)
+        self.cell = rnn.MultiRNNCell([self.cell] * n_layers)
+        self.outputs, _ = tf.nn.dynamic_rnn(cell=self.cell, inputs=self.X_t,
+                                            dtype=tf.float32, time_major=True)
 
-cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels))
-optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost)
+        self.W = tf.Variable(tf.random_normal([n_hidden, n_sensor_class]))
+        self.b = tf.Variable(tf.random_normal([n_sensor_class]))
+        self.logits = tf.matmul(self.outputs[-1], self.W) + self.b
+        self.labels = tf.reshape(self.Y, [-1])
 
-sess = tf.Session()
-sess.run(tf.global_variables_initializer())
+        self.cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels))
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.cost)
+
+        #######################
+
+        # TODO : LEARN HOW THESE WORK
+        self.time_step = 0
+
+        self.saver, self.session = self.init_session()
+        self.writer = tf.summary.FileWriter('LSTMlogs', self.session.graph)
+        self.summary = tf.summary.merge_all()
+
+    def init_session(self, restore_path):
+        saver = tf.train.Saver()
+        session = tf.InteractiveSession()
+
+        try:
+            saver.restore(session, restore_path)
+            print("Restoring model...")
+        except:
+            session.run(tf.global_variables_initializer())
+            print("Initializing new model...")
+
+        return saver, session
+
+    def save_model(self):
+        save_path = self.saver.save(self.session, "LSTMmodel")
+        print("Model saved in file: %s" % save_path)
+
+    def train(self, x_batch, y_batch):
+
+        _, loss = self.session.run([self.optimizer, self.cost], feed_dict={self.X: x_batch, self.Y: y_batch})
+        print('cost: ' + loss)
