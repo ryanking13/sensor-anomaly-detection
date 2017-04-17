@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 import tensorflow as tf
 from tensorflow.contrib import rnn
@@ -27,6 +27,8 @@ class LSTMModel:
 
         self.W = tf.Variable(tf.random_normal([n_hidden, n_sensor_class]))
         self.b = tf.Variable(tf.random_normal([n_sensor_class]))
+
+        # 마지막 output을 기준으로 양/불을 판단
         self.logits = tf.matmul(self.outputs[-1], self.W) + self.b
         self.labels = tf.reshape(self.Y, [-1])
 
