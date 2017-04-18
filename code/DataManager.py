@@ -6,7 +6,7 @@ import random
 # Train, Test 데이터를 불러오는 것을 담당해주는 클래스
 class DataManager:
 
-    def __init__(self, path='../data/original_wafer_data/', answer_file='aIndex.txt', num_test_data=None):
+    def __init__(self, path='../../data/original_wafer_data/', answer_file='aIndex.txt', num_test_data=None):
         # path : wafer_data가 저장되는 디렉토리
         # answer_file : 정답 파일 ( name-label pair)
         # num_test_data 는 지정하지 않으면 전체 데이터의 1/10로 지정됨 ( in load_data_name_and_labels() method )
@@ -77,7 +77,7 @@ class DataManager:
 
 
 
-''' 
+'''
 # for debug
 
 print('[*] Loading DataManager')
@@ -96,5 +96,4 @@ for i in range(10):
     for j in range(len(labels)):
         print('---------test-----------')
         print(data[j][0], labels[j])
-
 '''
