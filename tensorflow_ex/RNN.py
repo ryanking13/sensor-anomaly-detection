@@ -90,14 +90,16 @@ def prediction(seq_data):
     print("Predicted value: ", [num_arr[i] for i in predict])
     print("Accuracy: ", accuracy_val)
 
-seq_data_test = ['123', '345', '789']
-prediction(seq_data_test)
 
-seq_data_test = ['1234','2345','7890']
-prediction(seq_data_test)
+def main():
+    seq_data_test = ['123', '345', '789']
+    prediction(seq_data_test)
 
-seq_data_test = ['23', '78', '90']
-prediction(seq_data_test)
+    seq_data_test = ['1234','2345','7890']
+    prediction(seq_data_test)
 
-seq_data_test = ['12345', '34567', '67890']
-prediction(seq_data_test)
+    seq_data_test = ['23', '78', '90']
+    prediction(seq_data_test)
+
+    seq_data_test = ['12345', '34567', '67890']
+    prediction(seq_data_test)

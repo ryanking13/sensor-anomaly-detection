@@ -6,7 +6,7 @@ from LSTMSettings import *
 import numpy as np
 
 
-class LSTMModel:
+class LSTMNetwork:
 
     def __init__(self):
 
@@ -14,7 +14,7 @@ class LSTMModel:
         # [batch_size, time_steps, input_size]
         self.X = tf.placeholder(tf.float32, [None, None, n_sensors])
         # [batch_size, time_steps]
-        self.Y = tf.placeholder(tf.float32, [None, 1])
+        self.Y = tf.placeholder(tf.int32, [None, 1])
         # [time_steps, batch_size, input_size]
         self.X_t = tf.transpose(self.X, [1, 0, 2])
 
@@ -39,21 +39,24 @@ class LSTMModel:
 
         # TODO : LEARN HOW THESE WORK
         self.time_step = 0
-
         self.saver, self.session = self.init_session()
-        self.writer = tf.summary.FileWriter('LSTMlogs', self.session.graph)
-        self.summary = tf.summary.merge_all()
+        # self.writer = tf.summary.FileWriter('LSTMlogs', self.session.graph)
+        # self.summary = tf.summary.merge_all()
 
-    def init_session(self, restore_path):
+    def init_session(self, restore_path=''):
         saver = tf.train.Saver()
-        session = tf.InteractiveSession()
+        session = tf.Session()
 
-        try:
-            saver.restore(session, restore_path)
-            print("Restoring model...")
-        except:
-            session.run(tf.global_variables_initializer())
-            print("Initializing new model...")
+        session.run(tf.global_variables_initializer())
+        print("Initializing new model...")
+
+        # TODO : IMPLEMENT THIS
+        # try:
+        #     saver.restore(session, restore_path)
+        #     print("Restoring model...")
+        # except:
+        #     session.run(tf.global_variables_initializer())
+        #     print("Initializing new model...")
 
         return saver, session
 
@@ -64,4 +67,12 @@ class LSTMModel:
     def train(self, x_batch, y_batch):
 
         _, loss = self.session.run([self.optimizer, self.cost], feed_dict={self.X: x_batch, self.Y: y_batch})
-        print('cost: ' + loss)
+        print('cost: ', '{:.6f}'.format(loss))
+
+    def predict(self, x, y):
+        prediction = tf.cast(tf.argmax(self.logits, 1), tf.int32)
+        prediction_check = tf.equal(prediction, self.labels)
+        accuracy = tf.reduce_mean(tf.cast(prediction_check, tf.float32))
+
+        real, predict, accuracy_val = self.session.run([self.labels, prediction, accuracy], feed_dict={self.X: x , self.Y: y})
+        return real, predict, accuracy_val

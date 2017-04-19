@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import numpy as np
 
 
 # Train, Test 데이터를 불러오는 것을 담당해주는 클래스
@@ -16,6 +17,8 @@ class DataManager:
 
         self.train_data_labels, self.test_data_labels = self.load_data_name_and_labels(num_test_data)
         self.train_data, self.train_labels = self.load_data(self.train_data_labels)
+
+        random.seed()
 
     def load_file(self, file_name):
         try:
@@ -39,7 +42,7 @@ class DataManager:
                 print("[-] number of test data is too big, doing resize...")
             self.num_test_data = len(labels) // 2
         else:
-            self.num_test_data = len(labels) // 10
+            self.num_test_data = len(labels) // 5
 
         return labels[:-self.num_test_data], labels[-self.num_test_data:]
 
@@ -51,12 +54,12 @@ class DataManager:
 
         for l in name_labels:
             wafer_name = l[0] + '.txt'
-            label = l[1]
+            label = int(l[1])
             sensor_data = self.load_file(wafer_name).readlines()[1:]  # remove sensor name
+            sensor_data = np.array([data.split()[1:] for data in sensor_data], dtype=np.float32)
 
-            sensor_data = [data.split()[1:] for data in sensor_data]
             data_list.append(sensor_data)
-            label_list.append(label)
+            label_list.append([label])
 
         # data_list = [ (Matrix( num timesteps x num sensors ), label), ... ]
         return data_list, label_list
@@ -74,7 +77,6 @@ class DataManager:
 
     def get_test_data(self):
         return self.load_data(self.test_data_labels)
-
 
 
 '''
