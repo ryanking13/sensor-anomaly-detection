@@ -8,9 +8,9 @@ import numpy as np
 class DataManager:
 
     def __init__(self, path='../../data/original_wafer_data/', answer_file='aIndex.txt', num_test_data=None):
-        # path : wafer_data가 저장되는 디렉토리
+        # path : wafer_data가 저장된 디렉토리
         # answer_file : 정답 파일 ( name-label pair)
-        # num_test_data 는 지정하지 않으면 전체 데이터의 1/10로 지정됨 ( in load_data_name_and_labels() method )
+        # num_test_data 는 지정하지 않으면 전체 데이터의 1/5로 지정됨 ( in load_data_name_and_labels() method )
         self.path = path
         self.answer_file = answer_file
         self.num_test_data = 0
