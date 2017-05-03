@@ -1,6 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
-from DataManager import DataManager
+from LSTM_DataManager import DataManager
 from LSTMnetwork import LSTMNetwork
 
 

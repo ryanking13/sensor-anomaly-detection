@@ -13,7 +13,7 @@ class DataManager:
         # num_test_data 는 지정하지 않으면 전체 데이터의 1/5로 지정됨 ( in load_data_name_and_labels() method )
         self.path = path
         self.answer_file = answer_file
-        self.num_test_data = 0
+        self.num_test_data = 0  # will be initialized in load_data_adn_labels() method
 
         self.train_data_labels, self.test_data_labels = self.load_data_name_and_labels(num_test_data)
         self.train_data, self.train_labels = self.load_data(self.train_data_labels)
@@ -59,15 +59,20 @@ class DataManager:
             sensor_data = np.array([data.split()[1:] for data in sensor_data], dtype=np.float32)
 
             data_list.append(sensor_data)
-            label_list.append([label])
+            label_list.append(label)
+            #FOR_LSTM (MAY NEED FIX) #label_list.append([label])
 
         # data_list = [ (Matrix( num timesteps x num sensors ), label), ... ]
         return data_list, label_list
 
-    def get_train_data(self, batch_size):
+    def get_train_data(self, batch_size, get_all=False):
         train_data = []
         train_labels = []
-        idxs = random.sample(range(len(self.train_labels)), batch_size)
+
+        if not get_all:
+            idxs = random.sample(range(len(self.train_labels)), batch_size)
+        else:   # return all train_data
+            idxs = range(len(self.train_labels))
 
         for idx in idxs:
             train_data.append(self.train_data[idx])
