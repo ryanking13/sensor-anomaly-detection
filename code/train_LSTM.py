@@ -2,7 +2,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 from LSTM_DataManager import DataManager
 from LSTMnetwork import LSTMNetwork
-
+import random
 
 def start_train(batch_size, dm, network, epoch_size=20):
 

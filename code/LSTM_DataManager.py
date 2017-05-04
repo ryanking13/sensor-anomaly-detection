@@ -60,7 +60,8 @@ class DataManager:
 
             data_list.append(sensor_data)
             label_list.append(label)
-            #FOR_LSTM (MAY NEED FIX) #label_list.append([label])
+            # FOR_LSTM (MAY NEED FIX)
+            #label_list.append([label])
 
         # data_list = [ (Matrix( num timesteps x num sensors ), label), ... ]
         return data_list, label_list
