@@ -19,7 +19,7 @@ def start_test(knn, dm):
     for i in range(len(x)):
         x[i] = x[i][:1750]
 
-    real, predicted, accuracy = knn.test(x, y, method='BORDA')
+    real, predicted, accuracy = knn.test(x, y, distance_method='Eros', neighbor_method='SIMPLE')
 
     print('[*] test result')
     print("Pridicted :", predicted)
