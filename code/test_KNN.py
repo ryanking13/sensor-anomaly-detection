@@ -19,7 +19,7 @@ def start_test(knn, dm):
     for i in range(len(x)):
         x[i] = x[i][:1750]
 
-    real, predicted, accuracy = knn.test(x, y, distance_method='Eros', neighbor_method='SIMPLE')
+    real, predicted, accuracy = knn.test(x, y, distance_method='FastDTW', neighbor_method='SIMPLE')
 
     print('[*] test result')
     print("Pridicted :", predicted)
@@ -29,7 +29,7 @@ def start_test(knn, dm):
 def main():
 
     print('[*] Loading data manager')
-    dm = DataManager()
+    dm = DataManager(num_test_data=30)
     print('[*] Done loading data manager')
     print('[*] Constructing KNN model')
     knn = KNN()

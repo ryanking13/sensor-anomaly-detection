@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import sys
 from sklearn.decomposition import PCA
+import fastdtw
 
 class KNN:
 
@@ -69,7 +71,7 @@ class KNN:
     # Distance methods
     #################################################
 
-    # 두 Matrix의 uclidean distance를 구한다.
+    # Uclidean distance를 구한다.
     # 두 Matrix의 크기가 같음을 가정
     # 다를 경우 수정이 필요함
     def get_uclidean_distance(self, mat1, mat2, per_column=False):
@@ -92,7 +94,8 @@ class KNN:
 
         return V, s
 
-    # Eros(Extended Frobenius norm)을 이용한 similarity를 계산한다
+    # Eros(Extended Frobenius norm)을 이용한 distance를 계산한다
+    # V1, V2 = right eigenvector matrix
     def get_eros_distance(self, V1, V2):
         w = self.w_eigenvalues
 
@@ -130,6 +133,58 @@ class KNN:
         print("[*] Ended Eros setup")
         # self.w_eigenvalues = np.ones(self.w_eigenvalues.shape) # TEMP
         return self.w_eigenvalues
+
+    # Dynamic Time Warping을 사용한 두 Matrix의 distance를 계산한다
+    # 두 Matrix의 크기가 같음을 가정
+    # -- 심각하게 느림 --
+    def get_dtw(self, mat1, mat2):
+
+        global_cost_sum = 0
+        num_sensors = mat1.shape[1]
+
+        for col in range(num_sensors):
+            # s1, s2 = sensor data vector
+            s1 = mat1[:, col]
+            s2 = mat2[:, col]
+
+            # M != N 이어도 동작함
+            M = len(s1)
+            N = len(s2)
+            cost = sys.maxsize * np.ones((M, N))
+
+            # Initalize process
+            cost[0, 0] = abs(s1[0] - s2[0])
+            for i in range(1, M):
+                cost[i, 0] = cost[i-1, 0] + abs(s1[i] - s2[0])
+            for j in range(1, N):
+                cost[0, j] = cost[0, j-1] + abs(s1[0] - s2[j])
+
+            # Filling matrix
+            for i in range(1, M):
+                for j in range(1, N):
+                    pre_cost = cost[i-1, j-1], cost[i, j-1], cost[i-1, j]
+                    cost[i, j] = min(pre_cost) + abs(s1[i] - s2[j])
+
+            global_cost_sum += cost[-1, -1] / sum(cost.shape)
+
+        return global_cost_sum
+
+    # Fast Dynamic Time Warping을 사용한 두 Matrix의 distance를 계산한다
+    # -- 느림 --
+    def get_fast_dtw(self, mat1, mat2):
+
+        global_cost_sum = 0
+        num_sensors = mat1.shape[1]
+
+        for col in range(num_sensors):
+            # s1, s2 = sensor data vector
+            s1 = mat1[:, col]
+            s2 = mat2[:, col]
+
+            dist, _ = fastdtw.fastdtw(s1, s2, radius=1)
+            global_cost_sum += dist
+
+        return global_cost_sum
 
     #################################################
     # Neighbor Methods
@@ -186,11 +241,16 @@ class KNN:
             elif method == 'Eros':
                 V1 = self.train_eigenvectors[i]
                 dist = self.get_eros_distance(V1, V2)
+            elif method == 'DTW':
+                dist = self.get_dtw(np.array(train_data_set[i]), np.array(test_data))
+            elif method == 'FastDTW':
+                dist = self.get_fast_dtw(np.array(train_data_set[i]), np.array(test_data))
 
             distances.append((dist, train_label_set[i], i)) # Third index is just for debug
 
         # 가장 작은 distance 순서대로 k개의 neighbor를 고른다
         distances.sort()
+        print(distances)
         neighbors = []
         print('-----')
         for i in range(self.k):
