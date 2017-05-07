@@ -7,7 +7,7 @@ import numpy as np
 # Train, Test 데이터를 불러오는 것을 담당해주는 클래스
 class DataManager:
 
-    def __init__(self, path='../../data/original_wafer_data/', answer_file='aIndex.txt', num_test_data=None):
+    def __init__(self, path='../../data/reduced/', answer_file='aIndex.txt', num_test_data=None):
         # path : wafer_data가 저장된 디렉토리
         # answer_file : 정답 파일 ( name-label pair)
         # num_test_data 는 지정하지 않으면 전체 데이터의 1/5로 지정됨 ( in load_data_name_and_labels() method )
@@ -40,10 +40,11 @@ class DataManager:
             self.num_test_data = num_test_data
             if self.num_test_data >= len(labels):
                 print("[-] number of test data is too big, doing resize...")
-            self.num_test_data = len(labels) // 2
+                self.num_test_data = len(labels) // 2
         else:
             self.num_test_data = len(labels) // 5
 
+        # return labels[:], labels[-self.num_test_data:]
         return labels[:-self.num_test_data], labels[-self.num_test_data:]
 
     # [name, label]을 보고 해당하는 파일들에서 sensor 데이터를 찾아온다
@@ -53,7 +54,7 @@ class DataManager:
         label_list = []
 
         for l in name_labels:
-            wafer_name = l[0] + '.txt'
+            wafer_name = l[0] + '_reduced' + '.txt'
             label = int(l[1])
             sensor_data = self.load_file(wafer_name).readlines()[1:]  # remove sensor name
             sensor_data = np.array([data.split()[1:] for data in sensor_data], dtype=np.float32)

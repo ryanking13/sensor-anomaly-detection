@@ -11,7 +11,7 @@ class KNN:
         self.k = k  # num of neighbors
         self.train_data_set = []    # [ Matrix1( num of sensors * timesteps ), ... ]
         self.train_label_set = []   # [ wafer label1, ... ]
-        self.n_sensors = 83
+        self.n_sensors = 42
 
         # for Eros
         self.train_eigenvectors = np.array([])
@@ -197,27 +197,34 @@ class KNN:
     def get_neighbors_BORDA(self, train_data_set, train_label_set, test_data):
         distances = []
         length = len(train_data_set)
+        max_pointed = self.k + 10    # voting point를 지급할 개수
+        weight = 1  # not implemented
+
         for i in range(self.n_sensors):
             distances.append([])
 
         for i in range(length):
             dist = self.get_uclidean_distance(np.array(train_data_set[i]), np.array(test_data), per_column=True)
 
-            for j in range(self.n_sensors): # self.n_sensors = len(dist)
+            for j in range(self.n_sensors):  # self.n_sensors = len(dist)
                 distances[j].append((dist[j], i))
 
-        scores = [[0, i] for i in range(length)]
+        scores = [[0, i] for i in range(length)]  # [score, train_data_num]
         for i in range(self.n_sensors):
             distances[i].sort()
-            for j in range(len(distances[i])):
-                scores[distances[i][j][1]][0] += j
+            d_p = distances[i][max_pointed][0] - distances[i][0][0]
+            if d_p == 0:
+                d_p = 1
 
-        scores.sort()
+            for j in range(max_pointed):
+                d_j = distances[i][j][0] - distances[i][0][0]
+                scores[distances[i][j][1]][0] += weight * (1 + max_pointed*(1-(d_j/d_p)))
+
+        scores.sort(reverse=True)
         neighbors = []
         print('-----')
         for i in range(self.k):
             print(scores[i])
-            # TODO : implement weighted voting
             neighbors.append(train_label_set[scores[i][1]])
 
         return np.array(neighbors)
@@ -250,7 +257,6 @@ class KNN:
 
         # 가장 작은 distance 순서대로 k개의 neighbor를 고른다
         distances.sort()
-        print(distances)
         neighbors = []
         print('-----')
         for i in range(self.k):
