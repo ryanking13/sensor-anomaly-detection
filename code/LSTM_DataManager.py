@@ -40,7 +40,7 @@ class DataManager:
             f = open(path + file_name, 'r')
             return f
         except FileNotFoundError:
-            print("ERROR: File %s%s not exists, terminating process..." % (self.path, file_name))
+            print("ERROR: File %s%s not exists, terminating process..." % (path, file_name))
             exit(0)
 
     # answer_file의 값을 [wafer name, label] 꼴로 나누어 리턴한다
