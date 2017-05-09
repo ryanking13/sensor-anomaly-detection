@@ -26,6 +26,8 @@ def start_test(dm, network):
     for i in range(len(real)):
         if real[i] != predict[i]:
             print(real[i], predict[i])
+        elif real[i] == 0 and predict[i] == 0:
+            print("matched!")
     print('Accuracy: ', accuracy)
 
 
