@@ -10,10 +10,6 @@ def start_train(batch_size, dm, network, epoch_size=20):
     for epoch in range(epoch_size):
         x_batch, y_batch = dm.get_train_data(batch_size)
 
-        # 데이터의 time length가 일치하지 않아서 임시 조치
-        for i in range(len(x_batch)):
-            x_batch[i] = x_batch[i][:1750]
-
         print(str(epoch) + ': ', end='')
         network.train(x_batch, y_batch)
 
@@ -23,15 +19,13 @@ def start_train(batch_size, dm, network, epoch_size=20):
 def start_test(dm, network):
     x, y = dm.get_test_data()
 
-    # 데이터의 time length가 일치하지 않아서 임시 조치
-    for i in range(len(x)):
-        x[i] = x[i][:1750]
-
     real, predict, accuracy = network.predict(x, y)
 
     print('[*] test result')
-    print('Real Value: ', real)
-    print('Predicted Value: ', predict)
+    print('Real/Predicted(diff)')
+    for i in range(len(real)):
+        if real[i] != predict[i]:
+            print(real[i], predict[i])
     print('Accuracy: ', accuracy)
 
 
