@@ -19,9 +19,9 @@ class LSTMNetwork:
         self.X_t = tf.transpose(self.X, [1, 0, 2])
 
         # LSTM cell
-        self.cell = rnn.BasicLSTMCell(n_hidden)
-        self.cell = rnn.DropoutWrapper(self.cell, output_keep_prob=0.5)
-        self.cell = rnn.MultiRNNCell([self.cell] * n_layers)
+        #self.cell = rnn.BasicLSTMCell(n_hidden)
+        #self.cell = rnn.DropoutWrapper(self.cell, output_keep_prob=0.5)
+        self.cell = rnn.MultiRNNCell([rnn.DropoutWrapper(rnn.BasicLSTMCell(n_hidden), output_keep_prob=0.5) for _ in range(n_layers)])
         self.outputs, _ = tf.nn.dynamic_rnn(cell=self.cell, inputs=self.X_t,
                                             dtype=tf.float32, time_major=True)
 

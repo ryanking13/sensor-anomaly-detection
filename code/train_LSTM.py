@@ -19,6 +19,9 @@ def start_train(batch_size, dm, network, epoch_size=20):
 def start_test(dm, network):
     x, y = dm.get_test_data()
 
+    for i in range(len(x)):
+        x[i] = x[i][:1750]
+
     real, predict, accuracy = network.predict(x, y)
 
     print('[*] test result')
