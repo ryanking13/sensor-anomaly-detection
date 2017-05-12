@@ -16,7 +16,7 @@ def dateToInt( string ):
 	string = string.replace(' ',':')
 	string = string.replace('.',':')
 	#print(string)
-
+	
 	split = string.split(':')
 	year = int(split[0])
 	month = int(split[1])
@@ -113,7 +113,7 @@ for name in waferNames:
 	data = {}
 
 	print("Processing data of %s"%name)
-
+	
 	with open('./csv_files/snu_data1.csv') as csvfile:
 		spamreader = csv.reader(csvfile, delimiter = ',' , quotechar = '|' )
 		for row in spamreader:
