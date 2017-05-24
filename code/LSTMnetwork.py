@@ -69,7 +69,13 @@ class LSTMNetwork:
         _, loss = self.session.run([self.optimizer, self.cost], feed_dict={self.X: x_batch, self.Y: y_batch})
         print('cost: ', '{:.6f}'.format(loss))
 
-    def predict(self, x, y):
+    def predict(self, x):
+        prediction = tf.cast(tf.argmax(self.logits, 1), tf.int32)
+
+        predict = self.session.run([prediction], feed_dict={self.X: x , self.Y: y})
+        return predict
+
+    def test(self, x, y):
         prediction = tf.cast(tf.argmax(self.logits, 1), tf.int32)
         prediction_check = tf.equal(prediction, self.labels)
         accuracy = tf.reduce_mean(tf.cast(prediction_check, tf.float32))

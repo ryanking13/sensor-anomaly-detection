@@ -1,5 +1,5 @@
 from KNN import KNN
-from LSTM_DataManager import DataManager
+from Database import Database
 
 
 def start_train(knn, dm):
@@ -28,7 +28,7 @@ def start_test(knn, dm):
 def main():
 
     print('[*] Loading data manager')
-    dm = DataManager(num_test_data=200)
+    dm = Database(num_test_data=200)
     print('[*] Done loading data manager')
     print('[*] Constructing KNN model')
     knn = KNN()
