@@ -33,7 +33,7 @@ class LSTMNetwork:
         self.labels = tf.reshape(self.Y, [-1])
 
         self.cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.5).minimize(self.cost)
 
         #######################
 
@@ -48,7 +48,7 @@ class LSTMNetwork:
         session = tf.Session()
 
         session.run(tf.global_variables_initializer())
-        print("Initializing new model...")
+        #print("Initializing new model...")
 
         # TODO : IMPLEMENT THIS
         # try:
@@ -67,7 +67,7 @@ class LSTMNetwork:
     def train(self, x_batch, y_batch):
 
         _, loss = self.session.run([self.optimizer, self.cost], feed_dict={self.X: x_batch, self.Y: y_batch})
-        print('cost: ', '{:.6f}'.format(loss))
+        #print('cost: ', '{:.6f}'.format(loss))
 
     def predict(self, x):
         prediction = tf.cast(tf.argmax(self.logits, 1), tf.int32)

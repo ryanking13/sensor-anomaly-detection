@@ -1,24 +1,24 @@
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
 from Database import Database
 from LSTMnetwork import LSTMNetwork
 from accuracy_measure import f1_score
 import random, time
 
-def start_train(batch_size, dm, network, epoch_size=10):
+def start_train(batch_size, dm, network, epoch_size=50):
 
-    print('[*] train start')
+    # print('[*] train start')
     start_time = time.time()
 
     for epoch in range(epoch_size):
         x_batch, y_batch = dm.get_train_data(batch_size)
 
-        print(str(epoch) + ': ', end='')
+        #print(str(epoch) + ': ', end='')
         network.train(x_batch, y_batch)
 
     end_time = time.time()
-    print('[*] train end')
+    # print('[*] train end')
 
     return end_time - start_time
 
@@ -26,14 +26,14 @@ def start_train(batch_size, dm, network, epoch_size=10):
 def start_test(dm, network):
     x, y = dm.get_test_data()
 
-    print('[*] test start')
+    # print('[*] test start')
     start_time = time.time()
 
     real, predict, accuracy = network.test(x, y)
     f1 = f1_score(real, predict)
 
     end_time = time.time()
-    print('[*] test end')
+    # print('[*] test end')
 
     return real, predict, accuracy, f1, end_time-start_time
 
@@ -45,37 +45,38 @@ def main():
     # if batch_size == '':
     #     batch_size = batch_size_dft
 
-    # try_num = sys.argv[1]
-    # step_num = '_step' + sys.argv[2]
+    try_num = sys.argv[1]
+    step_num = '_step' + sys.argv[2]
 
-    try_num = ''
-    step_num = ''
+    print(try_num, step_num)
+    # try_num = '1'
+    # step_num = '_step11'
 
-    batch_size = 5
-    path = '../../data'
+    batch_size = 1
+    path = '../../data/'
     train_answer = 'trainList' + try_num + '.txt'
     test_answer = 'testList' + try_num + '.txt'
 
-    print('[*] Loading data manager')
+    # print('[*] Loading data manager')
     dm = Database(train_path=path, train_answer_file=train_answer,
                   test_path=path, test_answer_file=test_answer,
                   sufix=step_num)
-    print('[*] Done loading data manager')
+    # print('[*] Done loading data manager')
 
-    print('[*] Constructing network')
+    # print('[*] Constructing network')
     network = LSTMNetwork()
-    print('[*] Done constructing network')
+    # print('[*] Done constructing network')
 
     train_time = start_train(batch_size, dm, network)
     real, predict, accuracy, f1, test_time = start_test(dm, network)
 
-    print("----RESULTS----")
-    print('train_time: ', train_time)
-    print('test_time: ', test_time)
+    # print("----RESULTS----")
+    # print('train_time: ', train_time)
+    # print('test_time: ', test_time)
 
-    print('real: ', real)
-    print('predict: ', predict)
-    print('accuracy: ', accuracy)
+    # print('real: ', real)
+    # print('predict: ', predict)
+    # print('accuracy: ', accuracy)
     print('f1 score: ', f1)
 
 

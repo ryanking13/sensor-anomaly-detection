@@ -21,6 +21,10 @@ def f1_score(real, predicted):
         else:
             zero_one += 1
 
+    
+    if zero_match == 0:
+        return 0;
+        
     precision = zero_match / (zero_match + one_zero)
     recall = zero_match / (zero_match + zero_one)
 
