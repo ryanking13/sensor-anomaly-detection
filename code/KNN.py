@@ -17,7 +17,7 @@ class KNN:
         self.neighbor_method = neighbor_method
 
         # for Eros
-        self.w_eigenvalues = np.zeros(self.n_sensors)
+        self.w_eigenvalues = np.zeros(1)
 
     #################################################
     # TRAIN METHODS (interface)
@@ -58,7 +58,10 @@ class KNN:
 
         V, s = self.get_svd(data)
 
-        for i in range(self.n_sensors):
+        if self.w_eigenvalues.shape[0] != len(s):
+            self.w_eigenvalus = np.zeros(len(s))
+
+        for i in range(self.w_eigenvalues.shape[0]):
             self.w_eigenvalues[i] = max(self.w_eigenvalues[i], s[i])
 
         return V

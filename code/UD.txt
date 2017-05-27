@@ -1,0 +1,10 @@
+f1 score: 0.600000
+f1 score: 0.727273
+f1 score: 0.833333
+f1 score: 0.833333
+f1 score: 0.444444
+f1 score: 0.444444
+f1 score: 0.769231
+f1 score: 0.666667
+f1 score: 0.875000
+f1 score: 0.769231

@@ -1,29 +1,27 @@
 from KNN import KNN
 from Database import Database
 import sys
+from accuracy_measure import f1_score
 
 def start_train(knn, dm):
-    print('[*] train start')
+    # print('[*] train start')
     train_data_set, train_label_set = dm.get_train_data(get_all=True)
     for i in range(len(train_data_set)):
         knn.add_train_data(train_data_set[i], train_label_set[i][0])
-    print('[*] train end')
+    # print('[*] train end')
 
 
 def start_test(knn, dm):
     x, y = dm.get_test_data();
 
-    real, predicted, accuracy = knn.test(x, y, distance_method='UD', neighbor_method='SIMPLE')
+    # print('[*] test start')
 
-    print('[*] test result')
-    print('Real/Predicted(diff)');
-    for i in range(len(real)):
-        if real[i] != predicted[i]:
-            print(real[i], predicted[i])
-        elif real[i] == 0 and predicted[i] == 0:
-            print('matched!')
+    real, predicted, accuracy = knn.test(x, y)
+    f1 = f1_score(real, predicted)
 
-    print("Accuracy : %.6f" % accuracy)
+    # print('[*] test end')
+
+    return real, predicted, accuracy, f1
 
 def main():
     
@@ -36,17 +34,25 @@ def main():
     path = '../../data/'
     train_answer = 'trainList' + try_num + '.txt'
     test_answer = 'testList' + try_num + '.txt'
-    print('[*] Loading data manager')
+    
+    # print('[*] Loading data manager')
     dm = Database(train_path=path, train_answer_file=train_answer,
                 test_path=path, test_answer_file=test_answer,
                 sufix=step_num)
-    print('[*] Done loading data manager')
-    print('[*] Constructing KNN model')
-    knn = KNN()
-    print('[*] Done Construcing KNN model')
+    # print('[*] Done loading data manager')
+    
+    # print('[*] Constructing KNN model')
+    knn = KNN(distance_method='DTW', neighbor_method='BORDA')
+    # print('[*] Done Construcing KNN model')
 
     start_train(knn, dm)
-    start_test(knn, dm)
+    
+    real, predict, accuracy, f1 = start_test(knn, dm)
+
+    #print('   real: ', real)
+    #print('predict: ', predict)
+    #print('accuracy: %.6f' % accuracy)
+    print('f1 score: %.6f' % f1)
 
 if __name__ == '__main__':
     main()
