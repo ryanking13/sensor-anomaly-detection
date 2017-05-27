@@ -44,7 +44,7 @@ class KNN:
     def test(self, test_data_set, test_label_set, distance_method='UD', neighbor_method = 'SIMPLE'):
 
         predicted = self.predict(test_data_set, distance_method=distance_method, neighbor_method=neighbor_method)
-        test_label_set = np.array(test_label_set)
+        test_label_set = np.reshape(np.array(test_label_set), -1)
         accuracy = 1 - (predicted != test_label_set).sum() / float(predicted.size)
         return test_label_set, predicted, accuracy
 
@@ -222,9 +222,9 @@ class KNN:
 
         scores.sort(reverse=True)
         neighbors = []
-        print('-----')
+        # print('-----')
         for i in range(self.k):
-            print(scores[i])
+            # print(scores[i])
             neighbors.append(train_label_set[scores[i][1]])
 
         return np.array(neighbors)
@@ -258,9 +258,9 @@ class KNN:
         # 가장 작은 distance 순서대로 k개의 neighbor를 고른다
         distances.sort()
         neighbors = []
-        print('-----')
+        # print('-----')
         for i in range(self.k):
-            print(distances[i][0], distances[i][1])
+            # print(distances[i][0], distances[i][1])
             neighbors.append(distances[i][1])
 
         return np.array(neighbors)

@@ -1,0 +1,165 @@
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+0 1
+0 1
+0 1
+matched!
+matched!
+0 1
+Accuracy : 0.851852
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+matched!
+0 1
+0 1
+matched!
+0 1
+matched!
+Accuracy : 0.888889
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+0 1
+0 1
+matched!
+matched!
+matched!
+matched!
+matched!
+Accuracy : 0.925926
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+matched!
+matched!
+matched!
+0 1
+0 1
+matched!
+Accuracy : 0.925926
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+0 1
+0 1
+matched!
+0 1
+0 1
+0 1
+Accuracy : 0.814815
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+0 1
+0 1
+0 1
+matched!
+0 1
+matched!
+0 1
+Accuracy : 0.814815
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+matched!
+0 1
+matched!
+matched!
+0 1
+matched!
+1 0
+Accuracy : 0.888889
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+0 1
+matched!
+1 0
+0 1
+matched!
+0 1
+matched!
+Accuracy : 0.851852
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+matched!
+matched!
+matched!
+1 0
+1 0
+matched!
+matched!
+matched!
+Accuracy : 0.925926
+[*] Loading data manager
+[*] Done loading data manager
+[*] Constructing KNN model
+[*] Done Construcing KNN model
+[*] train start
+[*] train end
+[*] test result
+Real/Predicted(diff)
+matched!
+matched!
+0 1
+matched!
+matched!
+matched!
+1 0
+0 1
+Accuracy : 0.888889

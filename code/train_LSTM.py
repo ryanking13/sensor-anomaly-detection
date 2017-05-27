@@ -6,7 +6,7 @@ from LSTMnetwork import LSTMNetwork
 from accuracy_measure import f1_score
 import random, time
 
-def start_train(batch_size, dm, network, epoch_size=50):
+def start_train(batch_size, dm, network, epoch_size=5):
 
     # print('[*] train start')
     start_time = time.time()
@@ -45,14 +45,14 @@ def main():
     # if batch_size == '':
     #     batch_size = batch_size_dft
 
-    try_num = sys.argv[1]
-    step_num = '_step' + sys.argv[2]
+    # try_num = sys.argv[1]
+    # step_num = '_step' + sys.argv[2]
 
-    print(try_num, step_num)
-    # try_num = '1'
-    # step_num = '_step11'
+    # print(try_num, step_num)
+    try_num = '1'
+    step_num = '_step11'
 
-    batch_size = 1
+    batch_size = 20
     path = '../../data/'
     train_answer = 'trainList' + try_num + '.txt'
     test_answer = 'testList' + try_num + '.txt'
@@ -74,8 +74,8 @@ def main():
     # print('train_time: ', train_time)
     # print('test_time: ', test_time)
 
-    # print('real: ', real)
-    # print('predict: ', predict)
+    print('real: ', real)
+    print('predict: ', predict)
     # print('accuracy: ', accuracy)
     print('f1 score: ', f1)
 
