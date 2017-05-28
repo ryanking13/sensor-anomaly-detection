@@ -6,6 +6,16 @@ from LSTMnetwork import LSTMNetwork
 from accuracy_measure import f1_score
 import random, time
 
+def cut(data_set):
+    min_len = 987654321
+    for i in range(len(data_set)):
+        min_len = min( len(data_set[i]), min_len)
+
+    for i in range(len(data_set)):
+        data_set[i] = data_set[i][:min_len]
+
+    return data_set
+
 def start_train(batch_size, dm, network, epoch_size=5):
 
     # print('[*] train start')
@@ -13,7 +23,7 @@ def start_train(batch_size, dm, network, epoch_size=5):
 
     for epoch in range(epoch_size):
         x_batch, y_batch = dm.get_train_data(batch_size)
-
+        x_batch = cut(x_batch)
         #print(str(epoch) + ': ', end='')
         network.train(x_batch, y_batch)
 
@@ -25,7 +35,7 @@ def start_train(batch_size, dm, network, epoch_size=5):
 
 def start_test(dm, network):
     x, y = dm.get_test_data()
-
+    x = cut(x)
     # print('[*] test start')
     start_time = time.time()
 

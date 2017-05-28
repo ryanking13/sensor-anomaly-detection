@@ -49,6 +49,9 @@ class KNN:
         elif method == "FastDTW":
             self.train_data_set.append(train_data)
 
+        elif method == "PCA":
+            self.train_data_set.append(self.pca_setup(train_data))
+
         self.train_label_set.append(train_label)
 
     # Eros를 사용하기 위한 초기작업을 수행한다
@@ -65,6 +68,11 @@ class KNN:
             self.w_eigenvalues[i] = max(self.w_eigenvalues[i], s[i])
 
         return V
+
+    def pca_setup(self, data):
+
+        pca = PCA(n_components=3)
+        return pca.fit_transform(data)
 
     # 행렬의 svd 분석에서 나오는 eigenvalue 값을 구한다
     def get_svd(self, mat):
@@ -231,10 +239,11 @@ class KNN:
         distances = []
         method = self.distance_method
 
-        V2 = None
         if method == 'Eros':
             # Test data의 eigenvalue를 구한다
-            V2, _ = self.get_svd(test_data)
+            test_data, _ = self.get_svd(test_data)
+        elif method == 'PCA':
+            test_data = self.pca_setup(test_data)
 
         # 각 Train data에 대하여 distance를 구한다
         for i in range(len(train_data_set)):
@@ -243,11 +252,13 @@ class KNN:
             if method == 'UD':
                 dist = self.get_uclidean_distance(np.array(train_data_set[i]), np.array(test_data))
             elif method == 'Eros':
-                dist = self.get_eros_distance(train_data_set[i], V2)
+                dist = self.get_eros_distance(train_data_set[i], test_data)
             elif method == 'DTW':
                 dist = self.get_dtw(np.array(train_data_set[i]), np.array(test_data))
             elif method == 'FastDTW':
                 dist = self.get_fast_dtw(np.array(train_data_set[i]), np.array(test_data))
+            elif method == 'PCA':
+                dist = self.get_uclidean_distance(train_data_set[i], test_data)
 
             distances.append((dist, train_label_set[i], i)) # Third index is just for debug
 

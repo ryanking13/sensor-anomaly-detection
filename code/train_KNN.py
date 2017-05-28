@@ -3,17 +3,29 @@ from Database import Database
 import sys
 from accuracy_measure import f1_score
 
+def cut(data_set):
+    min_len = 987654321
+    for i in range(len(data_set)):
+        min_len = min( len(data_set[i]), min_len)
+
+    for i in range(len(data_set)):
+        data_set[i] = data_set[i][:min_len]
+
+    return data_set
+
+
 def start_train(knn, dm):
     # print('[*] train start')
     train_data_set, train_label_set = dm.get_train_data(get_all=True)
+    train_data_set = cut(train_data_set)
     for i in range(len(train_data_set)):
         knn.add_train_data(train_data_set[i], train_label_set[i][0])
     # print('[*] train end')
 
 
 def start_test(knn, dm):
-    x, y = dm.get_test_data();
-
+    x, y = dm.get_test_data()
+    x = cut(x)
     # print('[*] test start')
 
     real, predicted, accuracy = knn.test(x, y)
