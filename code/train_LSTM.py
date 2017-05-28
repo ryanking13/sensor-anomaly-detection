@@ -16,7 +16,7 @@ def cut(data_set):
 
     return data_set
 
-def start_train(batch_size, dm, network, epoch_size=5):
+def start_train(batch_size, dm, network, epoch_size=10):
 
     # print('[*] train start')
     start_time = time.time()
@@ -84,10 +84,10 @@ def main():
     # print('train_time: ', train_time)
     # print('test_time: ', test_time)
 
-    print('real: ', real)
+    print('   real: ', real)
     print('predict: ', predict)
-    # print('accuracy: ', accuracy)
-    print('f1 score: ', f1)
+    # print('accuracy: %.6f' % accuracy)
+    print('f1 score: %.6f' % f1)
 
 
 if __name__ == '__main__':
