@@ -33,7 +33,7 @@ class LSTMNetwork:
         self.labels = tf.reshape(self.Y, [-1])
 
         self.cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.5).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.1).minimize(self.cost)
 
         #######################
 
@@ -72,7 +72,7 @@ class LSTMNetwork:
     def predict(self, x):
         prediction = tf.cast(tf.argmax(self.logits, 1), tf.int32)
 
-        predict = self.session.run([prediction], feed_dict={self.X: x , self.Y: y})
+        predict = self.session.run([prediction], feed_dict={self.X: x, self.Y: y})
         return predict
 
     def test(self, x, y):
@@ -80,5 +80,5 @@ class LSTMNetwork:
         prediction_check = tf.equal(prediction, self.labels)
         accuracy = tf.reduce_mean(tf.cast(prediction_check, tf.float32))
 
-        real, predict, accuracy_val = self.session.run([self.labels, prediction, accuracy], feed_dict={self.X: x , self.Y: y})
+        real, predict, accuracy_val = self.session.run([self.labels, prediction, accuracy], feed_dict={self.X: x, self.Y: y})
         return real, predict, accuracy_val

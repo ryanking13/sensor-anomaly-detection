@@ -16,7 +16,7 @@ def cut(data_set):
 
     return data_set
 
-def start_train(batch_size, dm, network, epoch_size=10):
+def start_train(batch_size, dm, network, epoch_size=100):
 
     # print('[*] train start')
     start_time = time.time()
@@ -59,10 +59,10 @@ def main():
     # step_num = '_step' + sys.argv[2]
 
     # print(try_num, step_num)
-    try_num = '1'
+    try_num = str(random.randint(1, 20))
     step_num = '_step11'
 
-    batch_size = 20
+    batch_size = 65
     path = '../../data/'
     train_answer = 'trainList' + try_num + '.txt'
     test_answer = 'testList' + try_num + '.txt'
@@ -86,7 +86,7 @@ def main():
 
     print('   real: ', real)
     print('predict: ', predict)
-    # print('accuracy: %.6f' % accuracy)
+    print('accuracy: %.6f' % accuracy)
     print('f1 score: %.6f' % f1)
 
 
