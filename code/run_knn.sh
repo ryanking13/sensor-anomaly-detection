@@ -1,9 +1,9 @@
 #!/bin/bash
 
-for i in {1..20}
+for i in {1..25}
 do
-	for j in {11..11}
+	for j in {1..20}
 	do
-		python3 train_KNN.py $i $j
+		python3 train_KNN.py $j $i
 	done
 done
