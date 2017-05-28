@@ -54,7 +54,7 @@ def main():
     # print('[*] Done loading data manager')
     
     # print('[*] Constructing KNN model')
-    knn = KNN(distance_method='DTW', neighbor_method='BORDA')
+    knn = KNN(distance_method='PCA_UD', neighbor_method='BORDA')
     # print('[*] Done Construcing KNN model')
 
     start_train(knn, dm)
@@ -64,7 +64,8 @@ def main():
     #print('   real: ', real)
     #print('predict: ', predict)
     #print('accuracy: %.6f' % accuracy)
-    print('f1 score: %.6f' % f1)
+    #print('f1 score: %.6f' % f1)
+    print('%.6f' % f1)
 
 if __name__ == '__main__':
     main()

@@ -3,6 +3,7 @@
 import numpy as np
 import sys
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 import fastdtw
 
 class KNN:
@@ -16,7 +17,7 @@ class KNN:
         self.distance_method = distance_method
         self.neighbor_method = neighbor_method
 
-        # for Eros
+        # for Eros and PCA
         self.w_eigenvalues = np.zeros(1)
 
     #################################################
@@ -49,7 +50,10 @@ class KNN:
         elif method == "FastDTW":
             self.train_data_set.append(train_data)
 
-        elif method == "PCA":
+        elif method == "PCA_UD":
+            self.train_data_set.append(self.pca_setup(train_data))
+
+        elif method == "PCA_DTW":
             self.train_data_set.append(self.pca_setup(train_data))
 
         self.train_label_set.append(train_label)
@@ -68,12 +72,7 @@ class KNN:
             self.w_eigenvalues[i] = max(self.w_eigenvalues[i], s[i])
 
         return V
-
-    def pca_setup(self, data):
-
-        pca = PCA(n_components=3)
-        return pca.fit_transform(data)
-
+    
     # 행렬의 svd 분석에서 나오는 eigenvalue 값을 구한다
     def get_svd(self, mat):
         U, s, V = np.linalg.svd(mat)
@@ -82,6 +81,24 @@ class KNN:
         s = np.divide(s, sum_s)
 
         return V, s
+
+    def pca_setup(self, data):
+        mat, eigenvalues = self.get_pca(data)
+        
+        if self.w_eigenvalues.shape[0] != len(eigenvalues):
+            self.w_eigenvalues = np.zeros(len(eigenvalues))
+
+        for i in range(self.w_eigenvalues.shape[0]):
+            self.w_eigenvalues[i] = max(self.w_eigenvalues[i], eigenvalues[i])
+
+        return mat
+
+    def get_pca(self, data):
+        pca = PCA(n_components=6)
+        # data = StandardScaler().fit_transform(data)
+        mat = pca.fit_transform(data)
+        ev = pca.explained_variance_
+        return mat, ev
 
     #################################################
     # TEST METHODS
@@ -97,6 +114,13 @@ class KNN:
     def predict(self, test_data_set):
 
         train_data_set, train_label_set = self.get_train_data()
+
+        if self.distance_method == 'Eros':
+            for i in range(len(test_data_set)):
+                test_data_set[i], _ = self.get_svd(test_data_set[i])
+        elif self.distance_method in ['PCA_UD', 'PCA_DTW']:
+            for i in range(len(test_data_set)):
+                test_data_set[i], _ = self.get_pca(test_data_set[i])
 
         predicted = []
         for test_data in test_data_set:
@@ -140,9 +164,10 @@ class KNN:
     # get distance by Dynamic Time Warping method
     # assume size of two matrix is same ( if not, error )
     # very slow
-    def get_dtw(self, mat1, mat2):
+    def get_dtw(self, mat1, mat2, per_column=False):
 
         global_cost_sum = 0
+        cost_array = []
         num_sensors = mat1.shape[1]
 
         for col in range(num_sensors):
@@ -168,9 +193,15 @@ class KNN:
                     pre_cost = cost[i-1, j-1], cost[i, j-1], cost[i-1, j]
                     cost[i, j] = min(pre_cost) + abs(s1[i] - s2[j])
 
-            global_cost_sum += cost[-1, -1] / sum(cost.shape)
+            if per_column:
+                cost_array.append(cost[-1,-1] / sum(cost.shape))
+            else:
+                global_cost_sum += cost[-1, -1] / sum(cost.shape)
 
-        return global_cost_sum
+        if per_column:
+            return cost_array
+        else:
+            return global_cost_sum
 
     # get distance by Fase Dynamic Time Warping method
     # slow
@@ -200,20 +231,29 @@ class KNN:
     def get_neighbors_BORDA(self, train_data_set, train_label_set, test_data):
         distances = []
         length = len(train_data_set)
+        n_dim = len(test_data[0])
         max_pointed = self.k + 10    # voting point를 지급할 개수
-        weight = 1  # not implemented
+        weight = self.w_eigenvalues
+        # weight = 1
+        method = self.distance_method
 
-        for i in range(self.n_sensors):
+        for i in range(n_dim):
             distances.append([])
 
         for i in range(length):
-            dist = self.get_uclidean_distance(np.array(train_data_set[i]), np.array(test_data), per_column=True)
+            if method == 'UD' or method == 'PCA_UD':
+                dist = self.get_uclidean_distance(np.array(train_data_set[i]), np.array(test_data), per_column=True)
+            elif method == 'Eros':
+                print("IMPOSSIBLE COMBINATION")
+                exit(-1)
+            elif method == 'DTW' or method == 'PCA_DTW':
+                dist = self.get_dtw(np.array(train_data_set[i]), np.array(test_data), per_column=True)
 
-            for j in range(self.n_sensors):  # self.n_sensors = len(dist)
+            for j in range(n_dim):
                 distances[j].append((dist[j], i))
 
         scores = [[0, i] for i in range(length)]  # [score, train_data_num]
-        for i in range(self.n_sensors):
+        for i in range(n_dim):
             distances[i].sort()
             d_p = distances[i][max_pointed][0] - distances[i][0][0]
             if d_p == 0:
@@ -221,7 +261,7 @@ class KNN:
 
             for j in range(max_pointed):
                 d_j = distances[i][j][0] - distances[i][0][0]
-                scores[distances[i][j][1]][0] += weight * (1 + max_pointed*(1-(d_j/d_p)))
+                scores[distances[i][j][1]][0] += weight[i] * (1 + max_pointed*(1-(d_j/d_p)))
 
         scores.sort(reverse=True)
         neighbors = []
@@ -239,26 +279,18 @@ class KNN:
         distances = []
         method = self.distance_method
 
-        if method == 'Eros':
-            # Test data의 eigenvalue를 구한다
-            test_data, _ = self.get_svd(test_data)
-        elif method == 'PCA':
-            test_data = self.pca_setup(test_data)
-
         # 각 Train data에 대하여 distance를 구한다
         for i in range(len(train_data_set)):
             dist = None
 
-            if method == 'UD':
+            if method == 'UD' or method == 'PCA_UD':
                 dist = self.get_uclidean_distance(np.array(train_data_set[i]), np.array(test_data))
             elif method == 'Eros':
                 dist = self.get_eros_distance(train_data_set[i], test_data)
-            elif method == 'DTW':
+            elif method == 'DTW' or method == 'PCA_DTW':
                 dist = self.get_dtw(np.array(train_data_set[i]), np.array(test_data))
             elif method == 'FastDTW':
                 dist = self.get_fast_dtw(np.array(train_data_set[i]), np.array(test_data))
-            elif method == 'PCA':
-                dist = self.get_uclidean_distance(train_data_set[i], test_data)
 
             distances.append((dist, train_label_set[i], i)) # Third index is just for debug
 
