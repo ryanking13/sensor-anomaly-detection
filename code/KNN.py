@@ -56,6 +56,9 @@ class KNN:
         elif method == "PCA_DTW":
             self.train_data_set.append(self.pca_setup(train_data))
 
+        elif method == "PCA_FastDTW":
+            self.train_data_set.append(self.pca_setup(train_data))
+
         self.train_label_set.append(train_label)
 
     # Eros를 사용하기 위한 초기작업을 수행한다
@@ -118,7 +121,7 @@ class KNN:
         if self.distance_method == 'Eros':
             for i in range(len(test_data_set)):
                 test_data_set[i], _ = self.get_svd(test_data_set[i])
-        elif self.distance_method in ['PCA_UD', 'PCA_DTW']:
+        elif self.distance_method in ['PCA_UD', 'PCA_DTW', 'PCA_FastDTW']:
             for i in range(len(test_data_set)):
                 test_data_set[i], _ = self.get_pca(test_data_set[i])
 
@@ -205,9 +208,10 @@ class KNN:
 
     # get distance by Fase Dynamic Time Warping method
     # slow
-    def get_fast_dtw(self, mat1, mat2):
+    def get_fast_dtw(self, mat1, mat2, per_column=True):
 
         global_cost_sum = 0
+        cost_array = []
         num_sensors = mat1.shape[1]
 
         for col in range(num_sensors):
@@ -216,9 +220,15 @@ class KNN:
             s2 = mat2[:, col]
 
             dist, _ = fastdtw.fastdtw(s1, s2, radius=1)
-            global_cost_sum += dist
+            if per_column:
+                cost_array.append(dist)
+            else:
+                global_cost_sum += dist
 
-        return global_cost_sum
+        if per_column:
+            return cost_array
+        else:
+            return global_cost_sum
 
     #################################################
     # Neighbor Methods
@@ -233,8 +243,8 @@ class KNN:
         length = len(train_data_set)
         n_dim = len(test_data[0])
         max_pointed = self.k + 10    # voting point를 지급할 개수
-        weight = self.w_eigenvalues
-        # weight = 1
+        # weight = self.w_eigenvalues
+        weight = 1
         method = self.distance_method
 
         for i in range(n_dim):
@@ -249,6 +259,9 @@ class KNN:
             elif method == 'DTW' or method == 'PCA_DTW':
                 dist = self.get_dtw(np.array(train_data_set[i]), np.array(test_data), per_column=True)
 
+            elif method == 'FastDTW' or method == 'PCA_FastDTW':
+                dist = self.get_fastdtw(np.array(train_data_set[i]), np.array(test_data), per_column=True)
+
             for j in range(n_dim):
                 distances[j].append((dist[j], i))
 
@@ -261,7 +274,7 @@ class KNN:
 
             for j in range(max_pointed):
                 d_j = distances[i][j][0] - distances[i][0][0]
-                scores[distances[i][j][1]][0] += weight[i] * (1 + max_pointed*(1-(d_j/d_p)))
+                scores[distances[i][j][1]][0] += weight * (1 + max_pointed*(1-(d_j/d_p)))
 
         scores.sort(reverse=True)
         neighbors = []

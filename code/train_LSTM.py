@@ -16,7 +16,7 @@ def cut(data_set):
 
     return data_set
 
-def start_train(batch_size, dm, network, epoch_size=100):
+def start_train(batch_size, dm, network, epoch_size=10):
 
     # print('[*] train start')
     start_time = time.time()
@@ -55,14 +55,14 @@ def main():
     # if batch_size == '':
     #     batch_size = batch_size_dft
 
-    # try_num = sys.argv[1]
-    # step_num = '_step' + sys.argv[2]
+    try_num = sys.argv[1]
+    step_num = '_step' + sys.argv[2]
 
     # print(try_num, step_num)
-    try_num = str(random.randint(1, 20))
-    step_num = '_step11'
+    # try_num = str(random.randint(1, 20))
+    # step_num = '_step11'
 
-    batch_size = 65
+    batch_size = 30
     path = '../../data/'
     train_answer = 'trainList' + try_num + '.txt'
     test_answer = 'testList' + try_num + '.txt'
@@ -80,14 +80,30 @@ def main():
     train_time = start_train(batch_size, dm, network)
     real, predict, accuracy, f1, test_time = start_test(dm, network)
 
-    # print("----RESULTS----")
-    # print('train_time: ', train_time)
-    # print('test_time: ', test_time)
+    if False:
+        print('   real: ', real)
+        print('predict: ', predict)
+        print('accuracy: %.6f' % accuracy)
+        print('f1 score: %.6f' % f1)
+        # print('train_time: ', train_time)
+        # print('test_time: ', test_time)
 
-    print('   real: ', real)
-    print('predict: ', predict)
-    print('accuracy: %.6f' % accuracy)
-    print('f1 score: %.6f' % f1)
+    if True:
+        f_accuracy = open("RNN_accuracy.txt", "a")
+        f_f1 = open("RNN_fmeasure.txt", "a")
+        f_train_time = open("RNN_traintime.txt", "a")
+        f_test_time = open("RNN_testtime.txt", "a")
+        
+        postfix = ''
+        try_size = '20'
+        if try_num.endswith(try_size):
+            postfix = '\n'
+            print("done one set")
+
+        f_accuracy.write("%.6f %s" % (accuracy, postfix))
+        f_f1.write("%.6f %s" % (f1, postfix))
+        f_train_time.write("%.6f %s" % (train_time, postfix))
+        f_test_time.write("%.6f %s" % (test_time, postfix))
 
 
 if __name__ == '__main__':

@@ -21,7 +21,7 @@ class LSTMNetwork:
         # LSTM cell
         #self.cell = rnn.BasicLSTMCell(n_hidden)
         #self.cell = rnn.DropoutWrapper(self.cell, output_keep_prob=0.5)
-        self.cell = rnn.MultiRNNCell([rnn.DropoutWrapper(rnn.BasicLSTMCell(n_hidden), output_keep_prob=0.5) for _ in range(n_layers)])
+        self.cell = rnn.MultiRNNCell([rnn.DropoutWrapper(rnn.BasicLSTMCell(n_hidden), output_keep_prob=0.8) for _ in range(n_layers)])
         self.outputs, _ = tf.nn.dynamic_rnn(cell=self.cell, inputs=self.X_t,
                                             dtype=tf.float32, time_major=True)
 
@@ -33,7 +33,7 @@ class LSTMNetwork:
         self.labels = tf.reshape(self.Y, [-1])
 
         self.cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.1).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.05).minimize(self.cost)
 
         #######################
 

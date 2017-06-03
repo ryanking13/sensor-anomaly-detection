@@ -70,7 +70,7 @@ def main():
     # print('[*] Done loading data manager')
     
     # print('[*] Constructing KNN model')
-    d_method = 'UD'
+    d_method = 'Eros'
     n_method = 'SIMPLE'
     knn = KNN(distance_method=d_method, neighbor_method=n_method)
     # print('[*] Done Construcing KNN model')
@@ -83,15 +83,15 @@ def main():
     
     real, predict, accuracy, f1, test_time = start_test(knn, dm, test_data_set, test_label_set, length=min_len)
 
-    if False:
-        #print('   real: ', real)
-        #print('predict: ', predict)
-        #print('accuracy: %.6f' % accuracy)
-        #print('f1 score: %.6f' % f1)
-        print('%.6f' % f1)
-        print('time: %.6f %.6f' % (train_time, test_time))
-
     if True:
+        print('   real: ', real)
+        print('predict: ', predict)
+        print('accuracy: %.6f' % accuracy)
+        print('f1 score: %.6f' % f1)
+        #print('%.6f' % f1)
+        #print('time: %.6f %.6f' % (train_time, test_time))
+
+    if False:
     
         f_accuracy = open("%s_%s_accuracy.txt" % (d_method, n_method), "a")
         f_f1 = open("%s_%s_fmeasure.txt" % (d_method, n_method), "a")
