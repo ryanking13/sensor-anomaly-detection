@@ -16,7 +16,7 @@ def cut(data_set):
 
     return data_set
 
-def start_train(batch_size, dm, network, epoch_size=10):
+def start_train(batch_size, dm, network, epoch_size=1):
 
     # print('[*] train start')
     start_time = time.time()
@@ -56,13 +56,13 @@ def main():
     #     batch_size = batch_size_dft
 
     try_num = sys.argv[1]
-    step_num = '_step' + sys.argv[2]
+    step_num = '_step' + sys.argv[2] + '_reduced'
 
     # print(try_num, step_num)
     # try_num = str(random.randint(1, 20))
     # step_num = '_step11'
 
-    batch_size = 30
+    batch_size = 65
     path = '../../data/'
     train_answer = 'trainList' + try_num + '.txt'
     test_answer = 'testList' + try_num + '.txt'
@@ -80,7 +80,7 @@ def main():
     train_time = start_train(batch_size, dm, network)
     real, predict, accuracy, f1, test_time = start_test(dm, network)
 
-    if False:
+    if True:
         print('   real: ', real)
         print('predict: ', predict)
         print('accuracy: %.6f' % accuracy)
@@ -88,7 +88,7 @@ def main():
         # print('train_time: ', train_time)
         # print('test_time: ', test_time)
 
-    if True:
+    if False:
         f_accuracy = open("RNN_accuracy.txt", "a")
         f_f1 = open("RNN_fmeasure.txt", "a")
         f_train_time = open("RNN_traintime.txt", "a")

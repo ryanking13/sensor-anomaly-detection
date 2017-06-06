@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in {1..25}
+for i in {11..11}
 do
 	for j in {1..20}
 	do

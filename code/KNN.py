@@ -12,13 +12,12 @@ class KNN:
         self.k = k  # num of neighbors
         self.train_data_set = []    # [ Matrix1( num of sensors * timesteps ), ... ]
         self.train_label_set = []   # [ wafer label1, ... ]
-        self.n_sensors = 42
+        self.n_sensors = 20
 
         self.distance_method = distance_method
         self.neighbor_method = neighbor_method
-
         # for Eros and PCA
-        self.w_eigenvalues = np.zeros(1)
+        self.w_eigenvalues = np.ones(100)
 
     #################################################
     # TRAIN METHODS (interface)
@@ -37,6 +36,8 @@ class KNN:
     def add_train_data(self, train_data, train_label):
 
         method = self.distance_method
+
+        train_data = self.normalize(train_data)
 
         if method == "UD":
             self.train_data_set.append(train_data)
@@ -66,24 +67,29 @@ class KNN:
     # train data의 eigenvalue 값을 이용하여 곱해질 w를 구한다
     def eros_setup(self, data):
 
-        V, s = self.get_svd(data)
+        U, s, V = self.get_svd(data)
 
         if self.w_eigenvalues.shape[0] != len(s):
-            self.w_eigenvalus = np.zeros(len(s))
+            self.w_eigenvalues = np.zeros(len(s))
 
         for i in range(self.w_eigenvalues.shape[0]):
             self.w_eigenvalues[i] = max(self.w_eigenvalues[i], s[i])
 
-        return V
-    
+        return U
+
+    def eigenvalues_post_setup(self):
+        sum_w = np.sum(self.w_eigenvalues)
+        self.w_eigenvalues = np.divide(self.w_eigenvalues, sum_w)
+
     # 행렬의 svd 분석에서 나오는 eigenvalue 값을 구한다
     def get_svd(self, mat):
-        U, s, V = np.linalg.svd(mat)
-
+        m = np.cov(mat)
+        U, s, V = np.linalg.svd(m)
+        
         sum_s = np.sum(s)
         s = np.divide(s, sum_s)
 
-        return V, s
+        return U, s, V
 
     def pca_setup(self, data):
         mat, eigenvalues = self.get_pca(data)
@@ -103,6 +109,16 @@ class KNN:
         ev = pca.explained_variance_
         return mat, ev
 
+    def normalize(self, mat):
+        m = np.array(mat)
+        sum_mat = np.sum(m, axis=0)
+        # print('sum_mat', sum_mat)
+        for i in range(m.shape[1]):
+            if sum_mat[i] != 0.0:
+                m[:, i] = np.divide(m[:, i], sum_mat[i])
+
+        return m
+
     #################################################
     # TEST METHODS
     #################################################
@@ -118,9 +134,12 @@ class KNN:
 
         train_data_set, train_label_set = self.get_train_data()
 
+        for i in range(len(test_data_set)):
+            test_data_set[i] = self.normalize(test_data_set[i])
+
         if self.distance_method == 'Eros':
             for i in range(len(test_data_set)):
-                test_data_set[i], _ = self.get_svd(test_data_set[i])
+                test_data_set[i], _, __ = self.get_svd(test_data_set[i])
         elif self.distance_method in ['PCA_UD', 'PCA_DTW', 'PCA_FastDTW']:
             for i in range(len(test_data_set)):
                 test_data_set[i], _ = self.get_pca(test_data_set[i])
@@ -159,10 +178,13 @@ class KNN:
     def get_eros_distance(self, V1, V2):
         w = self.w_eigenvalues
 
+        #print('w', np.sum(w))
+        #print('V1', V1.shape)
         mul = np.absolute(np.sum(np.multiply(V1, V2), axis=0))
-        eros = 1 - np.sum(np.multiply(w, mul))
+        eros = np.sum(np.multiply(w, mul))
+        dist = np.sqrt(2-2*eros)
 
-        return eros
+        return dist
 
     # get distance by Dynamic Time Warping method
     # assume size of two matrix is same ( if not, error )
@@ -177,7 +199,6 @@ class KNN:
             # s1, s2 = sensor data vector
             s1 = mat1[:, col]
             s2 = mat2[:, col]
-
             # M != N 이어도 동작함
             M = len(s1)
             N = len(s2)
@@ -242,9 +263,9 @@ class KNN:
         distances = []
         length = len(train_data_set)
         n_dim = len(test_data[0])
-        max_pointed = self.k + 10    # voting point를 지급할 개수
-        # weight = self.w_eigenvalues
-        weight = 1
+        max_pointed = self.k    # voting point를 지급할 개수
+        weight = self.w_eigenvalues
+        # weight = 1
         method = self.distance_method
 
         for i in range(n_dim):
@@ -260,7 +281,7 @@ class KNN:
                 dist = self.get_dtw(np.array(train_data_set[i]), np.array(test_data), per_column=True)
 
             elif method == 'FastDTW' or method == 'PCA_FastDTW':
-                dist = self.get_fastdtw(np.array(train_data_set[i]), np.array(test_data), per_column=True)
+                dist = self.get_fast_dtw(np.array(train_data_set[i]), np.array(test_data), per_column=True)
 
             for j in range(n_dim):
                 distances[j].append((dist[j], i))
@@ -274,7 +295,8 @@ class KNN:
 
             for j in range(max_pointed):
                 d_j = distances[i][j][0] - distances[i][0][0]
-                scores[distances[i][j][1]][0] += weight * (1 + max_pointed*(1-(d_j/d_p)))
+                # scores[distances[i][j][1]][0] += weight * (1 + max_pointed*(1-(d_j/d_p)))
+                scores[distances[i][j][1]][0] += weight[i] * (1 + max_pointed*(1-(d_j/d_p)))
 
         scores.sort(reverse=True)
         neighbors = []

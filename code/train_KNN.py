@@ -24,8 +24,8 @@ def cut(data_set, length):
 def start_train(knn, dm, x, y, length=0):
     # print('[*] train start')
 
-    if length > 0:
-        x = cut(x, length)
+    #if length > 0:
+    #    x = cut(x, length)
     
     start_time = time.time()
     for i in range(len(x)):
@@ -39,8 +39,11 @@ def start_train(knn, dm, x, y, length=0):
 def start_test(knn, dm, x, y, length=0):
     # print('[*] test start')
 
-    if length > 0:
-        x = cut(x, length)
+    if knn.distance_method == 'Eros' or knn.distance_method.startswith('PCA'):
+        knn.eigenvalues_post_setup()
+
+    #if length > 0:
+    #    x = cut(x, length)
 
     start_time = time.time()
     real, predicted, accuracy = knn.test(x, y)
@@ -54,7 +57,7 @@ def start_test(knn, dm, x, y, length=0):
 def main():
     
     try_num = sys.argv[1]
-    step_num = '_step' + sys.argv[2]
+    step_num = '_step' + sys.argv[2] + '_reduced'
 
     # try_num = '3'
     # step_num = '_step11'
@@ -70,7 +73,7 @@ def main():
     # print('[*] Done loading data manager')
     
     # print('[*] Constructing KNN model')
-    d_method = 'Eros'
+    d_method = 'UD'
     n_method = 'SIMPLE'
     knn = KNN(distance_method=d_method, neighbor_method=n_method)
     # print('[*] Done Construcing KNN model')
@@ -84,11 +87,11 @@ def main():
     real, predict, accuracy, f1, test_time = start_test(knn, dm, test_data_set, test_label_set, length=min_len)
 
     if True:
-        print('   real: ', real)
-        print('predict: ', predict)
-        print('accuracy: %.6f' % accuracy)
-        print('f1 score: %.6f' % f1)
-        #print('%.6f' % f1)
+        #print('   real: ', real)
+        #print('predict: ', predict)
+        #print('accuracy: %.6f' % accuracy)
+        #print('f1 score: %.6f' % f1)
+        print('%.6f' % f1)
         #print('time: %.6f %.6f' % (train_time, test_time))
 
     if False:

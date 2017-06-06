@@ -33,7 +33,7 @@ class LSTMNetwork:
         self.labels = tf.reshape(self.Y, [-1])
 
         self.cost = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.labels))
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.05).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.5).minimize(self.cost)
 
         #######################
 
