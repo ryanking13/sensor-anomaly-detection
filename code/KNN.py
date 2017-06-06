@@ -16,8 +16,11 @@ class KNN:
 
         self.distance_method = distance_method
         self.neighbor_method = neighbor_method
+
         # for Eros and PCA
         self.w_eigenvalues = np.ones(100)
+
+        self.reduced_dimensions = None
 
     #################################################
     # TRAIN METHODS (interface)
@@ -80,6 +83,22 @@ class KNN:
     def eigenvalues_post_setup(self):
         sum_w = np.sum(self.w_eigenvalues)
         self.w_eigenvalues = np.divide(self.w_eigenvalues, sum_w)
+
+    def reduce_dimensions(self, n_dimensions=1):
+        train_data, train_label = self.get_train_data()
+
+        method = self.distance_method
+        ones = []
+        zeros = []
+
+        for i in range(len(train_label)):
+            if train_label[i] == 1:
+                ones.append(train_data)
+            else:
+                zeros.apend(train_data)
+
+        print(ones)
+        print(zeros)
 
     # 행렬의 svd 분석에서 나오는 eigenvalue 값을 구한다
     def get_svd(self, mat):
