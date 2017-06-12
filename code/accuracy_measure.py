@@ -1,4 +1,5 @@
-
+# returns f1 score
+# consider zero-zero as true-positive
 def f1_score(real, predicted):
     zero_match = 0      # both zero
     one_match = 0       # both one
