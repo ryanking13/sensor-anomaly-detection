@@ -400,6 +400,7 @@ class KNN:
             for j in range(max_pointed):
                 d_j = distances[i][j][0] - distances[i][0][0]
                 # scores[distances[i][j][1]][0] += weight * (1 + max_pointed*(1-(d_j/d_p)))
+                # dimension_weight * score * distance_weight_normalized
                 scores[distances[i][j][1]][0] += weight[i] * (1 + max_pointed*(1-(d_j/d_p)))
 
         scores.sort(reverse=True)

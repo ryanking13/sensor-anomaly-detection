@@ -1,3 +1,5 @@
+# KNN train/test script
+
 from KNN import KNN
 from Database import Database
 import sys
