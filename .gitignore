@@ -2,3 +2,4 @@
 /code/.idea
 /data/original_wafer_data
 **/__pycache__
+**/*.txt
